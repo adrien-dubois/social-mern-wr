@@ -5,5 +5,5 @@ mongoose.connect(process.env.MONGO_CONNECT,
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
-    .then(() => console.log('Connected to MongoDB'))
-    .catch((err) => console.log('Failed to connect to MongoDB', err));
+    .then(() => console.log('Connected to White Rabbit Database'))
+    .catch((err) => console.log('Failed to connect to White Rabbit Database', err));
