@@ -1,6 +1,7 @@
 const UserModel = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const {signUpErrors} = require("../utils/errors.utils");
 
 /*----- This calc for 3 days valid -----*/
 const maxAge = 3 * 24 * 60 * 60 * 1000;
@@ -16,8 +17,9 @@ const signUp = async (req, res) => {
         const user = await UserModel.create({pseudo, email, password});
         res.status(201).json({ user: user._id });
     }
-    catch (e){
-        res.status(500).send({ message: e});
+    catch (err){
+        const errors = signUpErrors(err);
+        res.status(500).send({ errors });
     }
 };
 
