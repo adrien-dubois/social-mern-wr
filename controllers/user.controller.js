@@ -23,7 +23,7 @@ const getUser = (req, res) => {
 };
 
 /**
- * Update a user by its IDa user by its ID
+ * Update a user by its ID user by its ID
  * */
 const updateUser = async (req, res) => {
 

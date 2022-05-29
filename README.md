@@ -17,3 +17,6 @@
 - `Mongoose` 6.3.4
 - `Nodemon` 2.0.16
 - `Validator` 13.7.0
+- `jsonwebtoken` 8.5.1
+- `CookieParser` 1.4.6
+- `BCrypt` 5.0.1
