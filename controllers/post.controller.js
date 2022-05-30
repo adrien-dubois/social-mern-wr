@@ -1,11 +1,11 @@
 const PostModel = require('../models/post.model');
 const UserModel = require('../models/user.model');
-const ObjectId = require('mongoose').Types.ObjectId;
+const mongoose = require('mongoose');
 
 /**
  * Get all posts
  * */
-exports.readPost = (req, res) => {
+const readPost = (req, res) => {
     PostModel.find((err, docs) => {
         if(!err) res.send(docs);
         else console.log('Error to get data ' + err);
@@ -15,7 +15,7 @@ exports.readPost = (req, res) => {
 /**
  * Create a new post
  * */
-exports.createPost = async (req, res) => {
+const createPost = async (req, res) => {
     const newPost = new PostModel({
         posterId: req.body.posterId,
         message: req.body.message,
@@ -36,7 +36,7 @@ exports.createPost = async (req, res) => {
 /**
  * Update a post with its ID
  * */
-exports.updatePost = async (req, res) => {
+const updatePost = async (req, res) => {
     const updatedRecord = {
         message: req.body.message
     };
@@ -59,7 +59,7 @@ exports.updatePost = async (req, res) => {
 /**
  * Delete a post by its ID
  * */
-exports.deletePost = async (req, res) => {
+const deletePost = async (req, res) => {
     try{
         const post = await PostModel.findByIdAndDelete({ _id: req.params.id });
 
@@ -70,3 +70,48 @@ exports.deletePost = async (req, res) => {
         res.status(500).json({ message: err });
     }
 };
+
+
+/**
+ * Like a new post by its ID
+ * */
+const like = async (req, res) => {
+
+    if(!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Post to like unknown'});
+
+    try {
+        const like = await PostModel.findByIdAndUpdate(
+            {  _id: req.params.id },
+            { $addToSet: { likers: req.body.id } },
+            { new: true, runValidators: true }
+        );
+
+        const liked = await PostModel.findByIdAndUpdate(
+            {  _id: req.body.id },
+            { $addToSet: { likes: req.params.id } },
+            { new: true, runValidators: true }
+        )
+
+        if(!like || !liked ) return res.status(404).json({ message: "Post to like unknown !!" });
+
+        res.status(200).json({ message: 'Post liked.'});
+    } catch (err) {
+        res.status(500).json({ message: err});
+    }
+};
+
+/**
+ * Unlike a post by its ID
+ * */
+const unlike = async (req, res) => {
+
+};
+                                                                        
+module.exports = {
+    createPost,
+    readPost,
+    updatePost,
+    deletePost,
+    like,
+    unlike
+}
