@@ -1,7 +1,7 @@
 const UserModel = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const {signUpErrors} = require("../utils/errors.utils");
+const { signUpErrors, signinErrors } = require("../utils/errors.utils");
 
 /*----- This calc for 3 days valid -----*/
 const maxAge = 3 * 24 * 60 * 60 * 1000;
@@ -19,7 +19,7 @@ const signUp = async (req, res) => {
     }
     catch (err){
         const errors = signUpErrors(err);
-        res.status(500).send({ errors });
+        res.status(500).json({ errors });
     }
 };
 
@@ -45,8 +45,9 @@ const signIn = async (req, res) => {
         res.cookie('jwt', token, { httpOnly: true, maxAge });
         res.status(200).json({ result: existingUser, message: "Connection established" });
 
-    } catch (e) {
-        res.status(500).json({ message: "Quelque chose n'a pas fonctionné.", e });
+    } catch (err) {
+        const errors = signinErrors(err);
+        res.status(500).json({ errors });
     }
 };
 
