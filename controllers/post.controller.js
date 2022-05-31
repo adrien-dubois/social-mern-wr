@@ -81,20 +81,21 @@ const like = async (req, res) => {
 
     try {
         const like = await PostModel.findByIdAndUpdate(
-            {  _id: req.params.id },
+            {_id: req.params.id},
             { $addToSet: { likers: req.body.id } },
             { new: true, runValidators: true }
         );
 
-        const liked = await PostModel.findByIdAndUpdate(
-            {  _id: req.body.id },
+        const liked = await UserModel.findByIdAndUpdate(
+            {_id: req.body.id},
             { $addToSet: { likes: req.params.id } },
             { new: true, runValidators: true }
-        )
+        );
 
         if(!like || !liked ) return res.status(404).json({ message: "Post to like unknown !!" });
 
-        res.status(200).json({ message: 'Post liked.'});
+        res.status(200).json({ message: 'Post liked.' });
+
     } catch (err) {
         res.status(500).json({ message: err});
     }
@@ -104,7 +105,28 @@ const like = async (req, res) => {
  * Unlike a post by its ID
  * */
 const unlike = async (req, res) => {
+    if(!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Post to unlike unknown'});
 
+    try {
+        const like = await PostModel.findByIdAndUpdate(
+            {_id: req.params.id},
+            { $pull: { likers: req.body.id } },
+            { new: true, runValidators: true }
+        );
+
+        const liked = await UserModel.findByIdAndUpdate(
+            {_id: req.body.id},
+            { $pull: { likes: req.params.id } },
+            { new: true, runValidators: true }
+        );
+
+        if(!like || !liked ) return res.status(404).json({ message: "Post to unlike unknown !!" });
+
+        res.status(200).json({ message: 'Post unliked.' });
+
+    } catch (err) {
+        res.status(500).json({ message: err});
+    }
 };
                                                                         
 module.exports = {
