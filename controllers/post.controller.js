@@ -3,13 +3,14 @@ const UserModel = require('../models/user.model');
 const mongoose = require('mongoose');
 
 /**
- * Get all posts
+ * Get all posts sort by newer first
+ * At the end of your request just add .sort with the createdAt argument at -1
  * */
 const readPost = (req, res) => {
     PostModel.find((err, docs) => {
         if(!err) res.send(docs);
         else console.log('Error to get data ' + err);
-    })
+    }).sort({ createdAt: -1});
 };
 
 /**
@@ -128,9 +129,103 @@ const unlike = async (req, res) => {
         res.status(500).json({ message: err});
     }
 };
+
+/**
+ * Comment a post with ID
+ * */
+const commentPost = async (req, res) => {
+    if(!mongoose.Types.ObjectId.isValid(req.params.id) ||!mongoose.Types.ObjectId.isValid(req.body.commenterId))
+        return res.status(400).json({ message: 'Post to comment unknown'});
+
+    const user = await UserModel.findById(req.body.commenterId);
+    if(!user) return res.status(404).json({ message: 'User unknown'});
+
+    try{
+        const comment = await PostModel.findByIdAndUpdate(
+            req.params.id,
+            {
+                $push: {
+                    comments: {
+                        commenterId: req.body.commenterId,
+                        commenterPseudo: req.body.commenterPseudo,
+                        text: req.body.text,
+                        timestamp: new Date().getTime()
+                    }
+                }
+            },
+            { new: true, runValidators: true });
+
+        if(!comment) return res.status(404).json({ message: "Post to comment unknown" });
+
+        res.status(200).json({ message: "Comment posted" });
+
+    }catch (err){
+        return res.status(500).send(err);
+    }
+};
+
+/**
+ * Edit a comment
+ * */
+const editCommentPost = (req, res) => {
+    if(!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Comment to edit unknown'});
+
+    try{
+        return PostModel.findById(
+            req.params.id,
+            (err, docs) => {
+                const theComment = docs.comments.find((comment) =>
+                    comment._id.equals(req.body.commentId)
+                );
+
+                if(!theComment) return res.status(404).send('Comment not found');
+
+                theComment.text = req.body.text;
+
+                return docs.save((err) => {
+                    if(!err) return res.status(200).send(docs);
+                    return res.status(500).send(err);
+                })
+            }
+        )
+
+    }catch (err){
+        return res.status(500).send(err);
+    }
+};
+
+/**
+ * Delete a comment
+ * */
+const deleteCommentPost = (req, res) => {
+    if(!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Comment to delete unknown'});
+
+    try{
+        return PostModel.findByIdAndUpdate(
+            req.params.id,
+            {
+                $pull: {
+                    comments: {
+                        _id: req.body.commentId,
+                    }
+                }
+            },
+    { new: true, runValidators: true },
+            (err, docs) => {
+                if(!err) return res.send(docs);
+                else return res.status(400).send(docs);
+            }
+        )
+    }catch (err){
+        return res.status(500).send(err);
+    }
+};
                                                                         
 module.exports = {
     createPost,
+    commentPost,
+    editCommentPost,
+    deleteCommentPost,
     readPost,
     updatePost,
     deletePost,
