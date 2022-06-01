@@ -12,11 +12,12 @@
 
 ### Dependencies
 
+- `BCrypt` 5.0.1
+- `CookieParser` 1.4.6
+- `CORS` 2.8.5
 - `Dotenv` 16.0.1
 - `Express` 4.18.1
+- `Jsonwebtoken` 8.5.1
 - `Mongoose` 6.3.4
 - `Nodemon` 2.0.16
 - `Validator` 13.7.0
-- `jsonwebtoken` 8.5.1
-- `CookieParser` 1.4.6
-- `BCrypt` 5.0.1
