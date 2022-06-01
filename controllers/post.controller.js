@@ -20,6 +20,7 @@ const createPost = async (req, res) => {
     const newPost = new PostModel({
         posterId: req.body.posterId,
         message: req.body.message,
+        picture: req.body.picture,
         video: req.body.video,
         likers: [],
         comments: []
@@ -38,15 +39,13 @@ const createPost = async (req, res) => {
  * Update a post with its ID
  * */
 const updatePost = async (req, res) => {
-    const updatedRecord = {
-        message: req.body.message
-    };
+    const updatedRecord = req.body;
     const { id: _id } = req.params;
 
     try{
         const updatedPost = await PostModel.findByIdAndUpdate(
-            { _id },
-            { $set: updatedRecord },
+            _id,
+            { ...updatedRecord, _id },
             { new: true, runValidators: true });
         if(!updatedPost) return res.status(404).json({ message: "Message inconnu." });
 

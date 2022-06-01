@@ -11,10 +11,10 @@ const maxAge = 3 * 24 * 60 * 60 * 1000;
  * */
 const signUp = async (req, res) => {
 
-    const { pseudo, email, password } = req.body
+    const { pseudo, email, password, picture } = req.body
 
     try {
-        const user = await UserModel.create({pseudo, email, password});
+        const user = await UserModel.create({pseudo, email, password, picture});
         res.status(201).json({ user: user._id });
     }
     catch (err){

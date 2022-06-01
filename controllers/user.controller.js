@@ -28,12 +28,12 @@ const getUser = (req, res) => {
 const updateUser = async (req, res) => {
 
     const { id: _id } = req.params;
-    const bio = req.body.bio;
+    const user = req.body;
 
     try{
         const updateUser = await UserModel.findByIdAndUpdate(
-            { _id },
-            { $set: { bio } },
+             _id ,
+            { ...user, _id },
             { new: true, runValidators: true });
         if(!updateUser){
             return res.status(404).json({ message: "L'utilisateur " + req.params.id + " n'existe pas" });
