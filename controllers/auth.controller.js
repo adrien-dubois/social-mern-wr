@@ -34,7 +34,8 @@ const signIn = async (req, res) => {
         if(!existingUser) return res.status(404).json({ message: "Email et/ou mot de passe incorrect(s)." });
 
         const isPasswordsValid = await bcrypt.compare(password, existingUser.password);
-        if(!isPasswordsValid) return res.status(400).json({ message: "Email et/ou mot de passe incorrect(s)." });
+        if(!isPasswordsValid) return res.status(400).send( "Email et/ou mot de passe incorrect(s)." );
+
 
         const token = jwt.sign(
             {  email: existingUser.email ,id: existingUser._id },
